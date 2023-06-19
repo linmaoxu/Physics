@@ -30,11 +30,11 @@ namespace Physics2D.Utils {
         }
 
         public static bool IntersectSphere_AABB(AABBEntity aabbEntity,SphereEntity sphereEntity) {
-            var sqrDist = SqrDistFromPointToAABB(sphereEntity.pos,aabbEntity);
+            float sqrDist = GetSqrDistFromPointToAABB(sphereEntity.pos,aabbEntity);
             return sqrDist <= sphereEntity.radius * sphereEntity.radius;
         }
 
-        static float SqrDistFromPointToAABB(Vector2 point,AABBEntity entity) {
+        static float GetSqrDistFromPointToAABB(Vector2 point,AABBEntity entity) {
             float v = 0;
             if(point.x < entity.minPos.x) {
                 v += (entity.minPos.x - point.x) * (entity.minPos.x - point.x);
