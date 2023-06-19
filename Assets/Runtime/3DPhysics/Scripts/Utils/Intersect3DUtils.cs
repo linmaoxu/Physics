@@ -29,12 +29,9 @@ namespace Physics3D.Utils
 
         public static bool IntersectSphere_Sphere(SphereEntity sphereEntity, SphereEntity sphereEntity2)
         {
-            float x = Mathf.Abs(sphereEntity.pos.x - sphereEntity2.pos.x);
-            float y = Mathf.Abs(sphereEntity.pos.y - sphereEntity2.pos.y);
-            float z = Mathf.Abs(sphereEntity.pos.z - sphereEntity2.pos.z);
-
-            float sqrDist = x * x + y * y + z * z;
-            float comparison = sphereEntity.radius * sphereEntity.radius + sphereEntity2.radius * sphereEntity2.radius;
+            float sqrDist = (sphereEntity.pos - sphereEntity2.pos).sqrMagnitude;
+            float r = sphereEntity.radius + sphereEntity2.radius;
+            float comparison = r * r;
             return sqrDist < comparison;
         }
 
