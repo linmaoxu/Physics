@@ -37,9 +37,62 @@ namespace Physics3D.Utils
 
         public static bool IntersectSphere_AABB(SphereEntity sphereEntity, AABBEntity aabbEntity)
         {
-            float sqrDist = GetSqrDistFromPointToAABB(sphereEntity.pos,aabbEntity);
+            float sqrDist = GetSqrDistFromPointToAABB(sphereEntity.pos, aabbEntity);
             float radiusSqr = sphereEntity.radius * sphereEntity.radius * sphereEntity.radius;
             return sqrDist <= radiusSqr;
+        }
+
+        public static bool IntersectOBB_OBB(OBBEntity obbEntity, OBBEntity obbEntity2)
+        {
+            return !(IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,obbEntity.xAxis) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,obbEntity.yAxis) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,obbEntity.zAxis) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,obbEntity2.xAxis) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,obbEntity2.yAxis) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,obbEntity2.zAxis) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,Vector3.Cross(obbEntity.xAxis,obbEntity2.xAxis)) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,Vector3.Cross(obbEntity.xAxis,obbEntity2.yAxis)) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,Vector3.Cross(obbEntity.xAxis,obbEntity2.zAxis)) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,Vector3.Cross(obbEntity.yAxis,obbEntity2.xAxis)) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,Vector3.Cross(obbEntity.yAxis,obbEntity2.yAxis)) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,Vector3.Cross(obbEntity.yAxis,obbEntity2.zAxis)) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,Vector3.Cross(obbEntity.zAxis,obbEntity2.xAxis)) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,Vector3.Cross(obbEntity.zAxis,obbEntity2.yAxis)) ||
+                     IsNotIntersectInAxis(obbEntity.vertexArray,obbEntity2.vertexArray,Vector3.Cross(obbEntity.zAxis,obbEntity2.zAxis)));
+        }
+
+        public static bool IntersectOBB_Sphere(OBBEntity obbEntity,SphereEntity sphereEntity) {
+            Vector3 dist = obbEntity.pos - sphereEntity.pos;
+            Quaternion inverseRot = Quaternion.Inverse(obbEntity.rot);
+            Vector3 inverseDist = inverseRot * dist;
+
+            float absX = Mathf.Max(inverseDist.x,-inverseDist.x);
+            float absY = Mathf.Max(inverseDist.y,-inverseDist.y);
+            float absZ = Mathf.Max(inverseDist.z,-inverseDist.z);
+            Vector3 absDist = new Vector3(absX,absY,absZ);
+
+            Vector3 realDist = Vector3.Max(absDist - obbEntity.halfSzie,Vector3.zero);
+
+            return realDist.sqrMagnitude <= sphereEntity.radius * sphereEntity.radius;
+        }
+
+        static bool IsNotIntersectInAxis(Vector3[] vertexArray, Vector3[] vertexArray2, Vector3 axis)
+        {
+            float[] range1 = GetRange(vertexArray, axis);
+            float[] range2 = GetRange(vertexArray2, axis);
+            return (range1[1] < range2[0] || range2[1] < range1[0]);
+        }
+
+        static float[] GetRange(Vector3[] vertexArray, Vector3 axis)
+        {
+            float[] range = new float[2] { float.MaxValue, float.MinValue };
+            for (int i = 0; i < vertexArray.Length; i++)
+            {
+                float value = Vector3.Dot(vertexArray[i], axis);
+                range[0] = Mathf.Min(range[0], value);
+                range[1] = Mathf.Max(range[1], value);
+            }
+            return range;
         }
 
         static float GetSqrDistFromPointToAABB(Vector3 point, AABBEntity entity)
