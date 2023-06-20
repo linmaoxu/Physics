@@ -22,7 +22,6 @@ namespace Physics3D.Entity {
             this.zAxis = zAxis;
 
             vertexArray = new Vector3[8];
-
             vertexArray[0] = pos + rot*(new Vector3(halfSzie.x,halfSzie.y,halfSzie.z));
             vertexArray[1] = pos + rot*(new Vector3(-halfSzie.x,halfSzie.y,halfSzie.z));
             vertexArray[2] = pos + rot*(new Vector3(halfSzie.x,-halfSzie.y,halfSzie.z));
